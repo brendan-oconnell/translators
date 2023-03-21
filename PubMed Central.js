@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2022-08-12 07:27:23"
+	"lastUpdated": "2023-03-21 12:34:59"
 }
 
 /*
@@ -124,26 +124,11 @@ function getSearchResults(doc, checkOnly) {
 	return found ? { ids: ids, pdfs: pdfCollection } : false;
 }
 
-function lookupPMCIDs(ids, doc, pdfLink) {
+async function lookupPMCIDs(ids, doc, pdfLink) {
 	var newUri = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&retmode=xml&id="
 		+ encodeURIComponent(ids.join(","));
   var nBibURL = "https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pmc/?format=medline&id=6494975&download=false";
   var nBibText = await requestText(nBibURL);
-  const translator = Zotero.loadTranslator('import');
-  translator.setTranslator('9ec64cfd-bea7-472a-9557-493c0c26b0fb'); // Medline/nbib
-  translator.setString(nBibText);
-  translator.setHandler('itemDone', (_obj, item) => {
-    // Zotero.debug(item.tags);
-    var tag = "";
-    for (tag in item.tags) {
-      Zotero.debug(item.tags[tag]);
-      newItem.tags.push(item.tags[tag]);
-      Zotero.debug(tagsArray);
-      // return tagsArray;
-    }
-  });
-
-  await translator.translate();
 
 	Zotero.debug(newUri);
 	ZU.doGet(newUri, function (text) {
@@ -283,8 +268,27 @@ function lookupPMCIDs(ids, doc, pdfLink) {
 				});
 			}
 
-			newItem.complete();
+			// newItem.complete();
 		}
+
+	const translator = Zotero.loadTranslator('import');
+	translator.setTranslator('9ec64cfd-bea7-472a-9557-493c0c26b0fb'); // Medline/nbib
+	translator.setString(nBibText);
+	translator.setHandler('itemDone', (_obj, item) => {
+	  // Zotero.debug(item.tags);
+	  var tag = "";
+	  for (tag in item.tags) {
+			Zotero.debug(item.tags[tag]);
+			newItem.tags.push(item.tags[tag]);
+			Zotero.debug(tagsArray);
+		// return tagsArray;
+	  }
+	});
+	translator.setHandler("done", function () {
+	  newItem.complete();
+	});
+
+	translator.translate();
 	});
 }
 
