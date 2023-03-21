@@ -278,7 +278,7 @@ async function lookupPMCIDs(ids, doc, pdfLink) {
 			// Zotero.debug(item.tags);
 			var tag = "";
 			for (tag in item.tags) {
-				Zotero.debug(item.tags[tag]);
+				// Zotero.debug(item.tags[tag]);
 				newItem.tags.push(item.tags[tag]);
 				Zotero.debug(newItem.tags);
 			}
