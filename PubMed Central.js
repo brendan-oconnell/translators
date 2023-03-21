@@ -42,7 +42,7 @@ function detectWeb(doc, url) {
 	|| 	doc.getElementsByClassName('fm-ids').length)) {
 		return "journalArticle";
 	}
-	
+
 	if (getSearchResults(doc, true)) {
 		return "multiple";
 	}
@@ -77,9 +77,9 @@ function doWeb(doc, url) {
 			pdf = url;
 		}
 		var pdfCollection = {};
-				
+
 		if (pdf) pdfCollection[pmcid] = pdf;
-			
+
 		lookupPMCIDs([pmcid], doc, pdfCollection);
 	}
 }
@@ -106,7 +106,7 @@ function getSearchResults(doc, checkOnly) {
 		if (pmcid) pmcid = pmcid.match(/PMC([\d]+)/);
 		if (pmcid) {
 			if (checkOnly) return true;
-			
+
 			var title = ZU.xpathText(article, './/div[@class="title"]');
 			var pdf = getPDF(article, './/div[@class="links"]/a'
 				+ '[@class="view" and contains(@href,".pdf")][1]');
@@ -115,9 +115,9 @@ function getSearchResults(doc, checkOnly) {
 				title,
 				checked: cb && cb.checked,
 			};
-			
+
 			found = true;
-			
+
 			if (pdf) pdfCollection[pmcid[1]] = pdf;
 		}
 	}
@@ -127,12 +127,30 @@ function getSearchResults(doc, checkOnly) {
 function lookupPMCIDs(ids, doc, pdfLink) {
 	var newUri = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&retmode=xml&id="
 		+ encodeURIComponent(ids.join(","));
+  var nBibURL = "https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pmc/?format=medline&id=6494975&download=false";
+  var nBibText = await requestText(nBibURL);
+  const translator = Zotero.loadTranslator('import');
+  translator.setTranslator('9ec64cfd-bea7-472a-9557-493c0c26b0fb'); // Medline/nbib
+  translator.setString(nBibText);
+  translator.setHandler('itemDone', (_obj, item) => {
+    // Zotero.debug(item.tags);
+    var tag = "";
+    for (tag in item.tags) {
+      Zotero.debug(item.tags[tag]);
+      newItem.tags.push(item.tags[tag]);
+      Zotero.debug(tagsArray);
+      // return tagsArray;
+    }
+  });
+
+  await translator.translate();
+
 	Zotero.debug(newUri);
 	ZU.doGet(newUri, function (text) {
 		text = text.replace(/(<[^!>][^>]*>)/g, function (str) {
 			return str.replace(/[-:]/gm, "");
 		}); // Strip hyphens and colons from element names, attribute names and attribute values
-		
+
 		text = text.replace(/<xref[^</]*<\/xref>/g, ""); // Strip xref cross reference from e.g. title
 		// Z.debug(text)
 		var parser = new DOMParser();
@@ -142,11 +160,11 @@ function lookupPMCIDs(ids, doc, pdfLink) {
 
 		for (var i in articles) {
 			var newItem = new Zotero.Item("journalArticle");
-			
+
 			var journal = ZU.xpath(articles[i], 'front/journalmeta');
 
 			newItem.journalAbbreviation = ZU.xpathText(journal, 'journalid[@journalidtype="nlmta"]');
-			
+
 			var journalTitle;
 			if ((journalTitle = ZU.xpathText(journal, 'journaltitlegroup/journaltitle'))) {
 				newItem.publicationTitle = journalTitle;
@@ -179,12 +197,12 @@ function lookupPMCIDs(ids, doc, pdfLink) {
 			}
 
 			newItem.DOI = ZU.xpathText(article, 'articleid[@pubidtype="doi"]');
-			
+
 			newItem.extra = "PMID: " + ZU.xpathText(article, 'articleid[@pubidtype="pmid"]') + "\n";
 			newItem.extra = newItem.extra + "PMCID: PMC" + ids[i];
 
 			newItem.title = ZU.trim(ZU.xpathText(article, 'titlegroup/articletitle'));
-			
+
 			newItem.volume = ZU.xpathText(article, 'volume');
 			newItem.issue = ZU.xpathText(article, 'issue');
 
@@ -200,7 +218,7 @@ function lookupPMCIDs(ids, doc, pdfLink) {
 			if (!newItem.pages) {
 				newItem.pages = ZU.xpathText(article, 'elocationid');
 			}
-			
+
 
 			var pubDate = ZU.xpath(article, 'pubdate[@pubtype="ppub"]');
 			if (!pubDate.length) {
@@ -242,7 +260,7 @@ function lookupPMCIDs(ids, doc, pdfLink) {
 				mimeType: "text/html",
 				snapshot: false
 			}];
-			
+
 			let pdfFileName;
 			if (pdfLink) {
 				pdfFileName = pdfLink[ids[i]];
@@ -256,7 +274,7 @@ function lookupPMCIDs(ids, doc, pdfLink) {
 				pdfFileName = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC"
 				+ ids[i] + "/pdf/" + ZU.xpathText(article, 'articleid[@pubidtype="publisherid"]') + ".pdf";
 			}
-			
+
 			if (pdfFileName) {
 				newItem.attachments.push({
 					title: "PubMed Central Full Text PDF",
