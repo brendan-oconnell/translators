@@ -124,11 +124,20 @@ function getSearchResults(doc, checkOnly) {
 	return found ? { ids: ids, pdfs: pdfCollection } : false;
 }
 
-async function lookupPMCIDs(ids, doc, pdfLink) {
+async function getNBibText(nBibURL) {
+	var nBibText = await requestText(nBibURL);
+	Zotero.debug(nBibText);
+	return nBibText;
+
+}
+
+function lookupPMCIDs(ids, doc, pdfLink) {
 	var newUri = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&retmode=xml&id="
 		+ encodeURIComponent(ids.join(","));
   var nBibURL = "https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pmc/?format=medline&id=6494975&download=false";
-  var nBibText = await requestText(nBibURL);
+	getNBibText(nBibURL);
+	// Zotero.debug(nBibText);
+
 
 	Zotero.debug(newUri);
 	ZU.doGet(newUri, function (text) {
