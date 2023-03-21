@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2023-03-21 12:34:59"
+	"lastUpdated": "2023-03-21 12:43:29"
 }
 
 /*
@@ -271,24 +271,23 @@ async function lookupPMCIDs(ids, doc, pdfLink) {
 			// newItem.complete();
 		}
 
-	const translator = Zotero.loadTranslator('import');
-	translator.setTranslator('9ec64cfd-bea7-472a-9557-493c0c26b0fb'); // Medline/nbib
-	translator.setString(nBibText);
-	translator.setHandler('itemDone', (_obj, item) => {
-	  // Zotero.debug(item.tags);
-	  var tag = "";
-	  for (tag in item.tags) {
-			Zotero.debug(item.tags[tag]);
-			newItem.tags.push(item.tags[tag]);
-			Zotero.debug(tagsArray);
-		// return tagsArray;
-	  }
-	});
-	translator.setHandler("done", function () {
-	  newItem.complete();
-	});
+		const translator = Zotero.loadTranslator('import');
+		translator.setTranslator('9ec64cfd-bea7-472a-9557-493c0c26b0fb'); // Medline/nbib
+		translator.setString(nBibText);
+		translator.setHandler('itemDone', (_obj, item) => {
+			// Zotero.debug(item.tags);
+			var tag = "";
+			for (tag in item.tags) {
+				Zotero.debug(item.tags[tag]);
+				newItem.tags.push(item.tags[tag]);
+				Zotero.debug(newItem.tags);
+			}
+		});
+		translator.setHandler("done", function () {
+			newItem.complete();
+		});
 
-	translator.translate();
+		translator.translate();
 	});
 }
 
