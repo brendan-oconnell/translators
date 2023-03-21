@@ -126,16 +126,15 @@ function getSearchResults(doc, checkOnly) {
 
 async function getNBibText(nBibURL) {
 	var nBibText = await requestText(nBibURL);
-	Zotero.debug(nBibText);
+	// Zotero.debug(nBibText);
 	return nBibText;
-
 }
 
-function lookupPMCIDs(ids, doc, pdfLink) {
+async function lookupPMCIDs(ids, doc, pdfLink) {
 	var newUri = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&retmode=xml&id="
 		+ encodeURIComponent(ids.join(","));
-  var nBibURL = "https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pmc/?format=medline&id=6494975&download=false";
-	getNBibText(nBibURL);
+	var nBibURL = "https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pmc/?format=medline&id=6494975&download=false";
+	var nBibText = await getNBibText(nBibURL);
 	// Zotero.debug(nBibText);
 
 
@@ -289,8 +288,9 @@ function lookupPMCIDs(ids, doc, pdfLink) {
 			for (tag in item.tags) {
 				// Zotero.debug(item.tags[tag]);
 				newItem.tags.push(item.tags[tag]);
-				Zotero.debug(newItem.tags);
+
 			}
+			Zotero.debug(newItem.tags);
 		});
 		translator.setHandler("done", function () {
 			newItem.complete();
