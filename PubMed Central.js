@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2023-03-21 12:43:29"
+	"lastUpdated": "2023-03-27 12:32:48"
 }
 
 /*
@@ -50,20 +50,19 @@ function detectWeb(doc, url) {
 	return false;
 }
 
-function doWeb(doc, url) {
+async function doWeb(doc, url) {
 	if (detectWeb(doc, url) == "multiple") {
 		var results = getSearchResults(doc);
-		Zotero.selectItems(results.ids, function (ids) {
-			if (!ids) {
-				return true;
-			}
-			var pmcids = [];
-			for (var i in ids) {
-				pmcids.push(i);
-			}
-			lookupPMCIDs(pmcids, doc, results.pdfs);
-			return true;
-		});
+	let ids = await Zotero.selectItems(results.ids);
+	if (!ids) {
+	  return true;
+	}
+	var pmcids = [];
+	for (var i in ids) {
+	  pmcids.push(i);
+	}
+	await lookupPMCIDs(pmcids, doc, results.pdfs);
+	return true;
 	}
 	else {
 		var pmcid = getPMCID(url);
@@ -80,7 +79,7 @@ function doWeb(doc, url) {
 
 		if (pdf) pdfCollection[pmcid] = pdf;
 
-		lookupPMCIDs([pmcid], doc, pdfCollection);
+		await lookupPMCIDs([pmcid], doc, pdfCollection);
 	}
 }
 
@@ -124,21 +123,17 @@ function getSearchResults(doc, checkOnly) {
 	return found ? { ids: ids, pdfs: pdfCollection } : false;
 }
 
-async function getNBibText(nBibURL) {
-	var nBibText = await requestText(nBibURL);
-	// Zotero.debug(nBibText);
-	return nBibText;
-}
-
 async function lookupPMCIDs(ids, doc, pdfLink) {
 	var newUri = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&retmode=xml&id="
 		+ encodeURIComponent(ids.join(","));
-	var nBibURL = "https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pmc/?format=medline&id=6494975&download=false";
-	var nBibText = await getNBibText(nBibURL);
+  // TODO: replace nBibURL with real URL
+  // Zotero.debug(ids[0]);
+	var nBibURL = "https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pmc/?format=medline&id=" + ids[0] + "&download=false";
+	var nBibText = await requestText(nBibURL);
 	// Zotero.debug(nBibText);
 
 
-	Zotero.debug(newUri);
+	// Zotero.debug(newUri);
 	ZU.doGet(newUri, function (text) {
 		text = text.replace(/(<[^!>][^>]*>)/g, function (str) {
 			return str.replace(/[-:]/gm, "");
@@ -369,7 +364,41 @@ var testCases = [
 						"mimeType": "application/pdf"
 					}
 				],
-				"tags": [],
+				"tags": [
+					{
+						"tag": "Animals"
+					},
+					{
+						"tag": "Collagen/*metabolism"
+					},
+					{
+						"tag": "Guinea Pigs"
+					},
+					{
+						"tag": "Lung/metabolism/physiopathology"
+					},
+					{
+						"tag": "Male"
+					},
+					{
+						"tag": "Models, Animal"
+					},
+					{
+						"tag": "Oxygen Inhalation Therapy/*adverse effects"
+					},
+					{
+						"tag": "Pulmonary Edema/etiology"
+					},
+					{
+						"tag": "Pulmonary Fibrosis/etiology"
+					},
+					{
+						"tag": "Respiratory Mucosa/*physiopathology"
+					},
+					{
+						"tag": "Time Factors"
+					}
+				],
 				"notes": [],
 				"seeAlso": []
 			}
@@ -462,7 +491,26 @@ var testCases = [
 						"mimeType": "application/pdf"
 					}
 				],
-				"tags": [],
+				"tags": [
+					{
+						"tag": "*Epidemiologic Methods"
+					},
+					{
+						"tag": "Biostatistics/*methods"
+					},
+					{
+						"tag": "Evaluation Studies as Topic"
+					},
+					{
+						"tag": "Humans"
+					},
+					{
+						"tag": "Research Design/*standards"
+					},
+					{
+						"tag": "United States"
+					}
+				],
 				"notes": [],
 				"seeAlso": []
 			}
@@ -595,6 +643,119 @@ var testCases = [
 					}
 				],
 				"tags": [],
+				"notes": [],
+				"seeAlso": []
+			}
+		]
+	},
+	{
+		"type": "web",
+		"url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6494975/",
+		"items": [
+			{
+				"itemType": "journalArticle",
+				"title": "Risk of subsequent primary neoplasms in survivors of adolescent and young adult cancer (Teenage and Young Adult Cancer Survivor Study): a population-based, cohort study",
+				"creators": [
+					{
+						"lastName": "Bright",
+						"firstName": "Chloe J",
+						"creatorType": "author"
+					},
+					{
+						"lastName": "Reulen",
+						"firstName": "Raoul C",
+						"creatorType": "author"
+					},
+					{
+						"lastName": "Winter",
+						"firstName": "David L",
+						"creatorType": "author"
+					},
+					{
+						"lastName": "Stark",
+						"firstName": "Daniel P",
+						"creatorType": "author"
+					},
+					{
+						"lastName": "McCabe",
+						"firstName": "Martin G",
+						"creatorType": "author"
+					},
+					{
+						"lastName": "Edgar",
+						"firstName": "Angela B",
+						"creatorType": "author"
+					},
+					{
+						"lastName": "Frobisher",
+						"firstName": "Clare",
+						"creatorType": "author"
+					},
+					{
+						"lastName": "Hawkins",
+						"firstName": "Michael M",
+						"creatorType": "author"
+					}
+				],
+				"date": "2019-4",
+				"DOI": "10.1016/S1470-2045(18)30903-3",
+				"ISSN": "1470-2045",
+				"abstractNote": "Background\nFew studies have investigated the risks of subsequent primary neoplasms after adolescent and young adult (AYA) cancer. We investigated the risks of specific subsequent primary neoplasms after each of 16 types of AYA cancer.\n\nMethods\nThe Teenage and Young Adult Cancer Survivor Study is a population-based cohort of 200 945 survivors of cancer diagnosed when aged 15–39 years in England and Wales from Jan 1, 1971, to Dec 31, 2006. The cohort was established using cancer registrations from the Office for National Statistics and the Welsh Cancer registry. Follow-up was from 5-year survival until the first occurrence of death, emigration, or study end date (Dec 31, 2012). In this analysis, we focus on the risk of specific subsequent primary neoplasms after 16 types of AYA cancer: breast; cervical; testicular; Hodgkin lymphoma (female); Hodgkin lymphoma (male); melanoma; CNS (intracranial); colorectal; non-Hodgkin lymphoma; thyroid; soft-tissue sarcoma; ovarian; bladder; other female genital; leukaemia; and head and neck cancer. We report absolute excess risks (AERs; per 10 000 person-years) and cumulative incidence of specific types of subsequent primary neoplasm after each type of AYA cancer.\n\nFindings\nDuring the 2 631 326 person-years of follow-up (median follow-up 16·8 years, IQR 10·5–25·2), 12 321 subsequent primary neoplasms were diagnosed in 11 565 survivors, most frequently among survivors of breast cancer, cervical cancer, testicular cancer, and Hodgkin lymphoma. AERs of any subsequent primary neoplasms were 19·5 per 10 000 person-years (95% CI 17·4–21·5) in survivors of breast cancer, 10·2 (8·0–12·4) in survivors of cervical cancer, 18·9 (16·6–21·1) in survivors of testicular cancer, 55·7 (50·4–61·1) in female survivors of Hodgkin lymphoma, and 29·9 (26·3–33·6) in male survivors of Hodgkin lymphoma. The cumulative incidence of all subsequent primary neoplasms 35 years after diagnosis was 11·9% (95% CI 11·3–12·6) in survivors of breast cancer, 15·8% (14·8–16·7) in survivors of cervical cancer, 20·2% (18·9–21·5) in survivors of testicular cancer, 26·6% (24·7–28·6) in female survivors of Hodgkin lymphoma, and 16·5% (15·2–18·0) in male survivors of Hodgkin lymphoma. In patients who had survived at least 30 years from diagnosis of cervical cancer, testicular cancer, Hodgkin lymphoma in women, breast cancer, and Hodgkin lymphoma in men, we identified a small number of specific subsequent primary neoplasms that account for 82%, 61%, 58%, 45%, and 41% of the total excess number of neoplasms, respectively. Lung cancer accounted for a notable proportion of the excess number of neoplasms across all AYA groups investigated.\n\nInterpretation\nOur finding that a small number of specific subsequent primary neoplasms account for a large percentage of the total excess number of neoplasms in long-term survivors of cervical, breast, and testicular cancer, and Hodgkin lymphoma provides an evidence base to inform priorities for clinical long-term follow-up. The prominence of lung cancer after each of these AYA cancers indicates the need for further work aimed at preventing and reducing the burden of this cancer in future survivors of AYA cancer.\n\nFunding\nCancer Research UK, National Institute for Health Research, Academy of Medical Sciences, and Children with Cancer UK.",
+				"extra": "PMID: 30797674\nPMCID: PMC6494975",
+				"issue": "4",
+				"journalAbbreviation": "Lancet Oncol",
+				"libraryCatalog": "PubMed Central",
+				"pages": "531-545",
+				"publicationTitle": "The Lancet. Oncology",
+				"shortTitle": "Risk of subsequent primary neoplasms in survivors of adolescent and young adult cancer (Teenage and Young Adult Cancer Survivor Study)",
+				"url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6494975/",
+				"volume": "20",
+				"attachments": [
+					{
+						"title": "PubMed Central Link",
+						"mimeType": "text/html",
+						"snapshot": false
+					},
+					{
+						"title": "PubMed Central Full Text PDF",
+						"mimeType": "application/pdf"
+					}
+				],
+				"tags": [
+					{
+						"tag": "Adolescent"
+					},
+					{
+						"tag": "Cancer Survivors/*statistics & numerical data"
+					},
+					{
+						"tag": "Cohort Studies"
+					},
+					{
+						"tag": "England/epidemiology"
+					},
+					{
+						"tag": "Humans"
+					},
+					{
+						"tag": "Incidence"
+					},
+					{
+						"tag": "Neoplasms, Second Primary/diagnosis/*epidemiology/prevention & control"
+					},
+					{
+						"tag": "Registries/statistics & numerical data"
+					},
+					{
+						"tag": "Risk Factors"
+					},
+					{
+						"tag": "Wales/epidemiology"
+					},
+					{
+						"tag": "Young Adult"
+					}
+				],
 				"notes": [],
 				"seeAlso": []
 			}
