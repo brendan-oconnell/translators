@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2023-03-27 12:32:48"
+	"lastUpdated": "2023-03-27 13:45:42"
 }
 
 /*
@@ -54,6 +54,7 @@ async function doWeb(doc, url) {
 	if (detectWeb(doc, url) == "multiple") {
 		var results = getSearchResults(doc);
 	let ids = await Zotero.selectItems(results.ids);
+	Zotero.debug(ids);
 	if (!ids) {
 	  return true;
 	}
@@ -364,41 +365,7 @@ var testCases = [
 						"mimeType": "application/pdf"
 					}
 				],
-				"tags": [
-					{
-						"tag": "Animals"
-					},
-					{
-						"tag": "Collagen/*metabolism"
-					},
-					{
-						"tag": "Guinea Pigs"
-					},
-					{
-						"tag": "Lung/metabolism/physiopathology"
-					},
-					{
-						"tag": "Male"
-					},
-					{
-						"tag": "Models, Animal"
-					},
-					{
-						"tag": "Oxygen Inhalation Therapy/*adverse effects"
-					},
-					{
-						"tag": "Pulmonary Edema/etiology"
-					},
-					{
-						"tag": "Pulmonary Fibrosis/etiology"
-					},
-					{
-						"tag": "Respiratory Mucosa/*physiopathology"
-					},
-					{
-						"tag": "Time Factors"
-					}
-				],
+				"tags": [],
 				"notes": [],
 				"seeAlso": []
 			}
@@ -491,26 +458,7 @@ var testCases = [
 						"mimeType": "application/pdf"
 					}
 				],
-				"tags": [
-					{
-						"tag": "*Epidemiologic Methods"
-					},
-					{
-						"tag": "Biostatistics/*methods"
-					},
-					{
-						"tag": "Evaluation Studies as Topic"
-					},
-					{
-						"tag": "Humans"
-					},
-					{
-						"tag": "Research Design/*standards"
-					},
-					{
-						"tag": "United States"
-					}
-				],
+				"tags": [],
 				"notes": [],
 				"seeAlso": []
 			}
